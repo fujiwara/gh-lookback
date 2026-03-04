@@ -5,9 +5,6 @@ A GitHub CLI extension that retrieves your activity history (PRs created, PRs re
 ## Installation
 
 ```bash
-gh extension install fujiwara/gh-lookback
-
-# or via go install
 go install github.com/fujiwara/gh-lookback/cmd/gh-lookback@latest
 ```
 
