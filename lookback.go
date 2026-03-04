@@ -3,6 +3,7 @@ package lookback
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
@@ -152,10 +153,12 @@ func Fetch(client *api.RESTClient, user string, opts Options) (*LookbackResult, 
 	}
 
 	// PRs created by user
+	slog.Info("Fetching PRs created ...", "user", user)
 	prsCreated, err := searchAll(client, fmt.Sprintf("type:pr author:%s created:%s", user, dateRange))
 	if err != nil {
 		return nil, fmt.Errorf("searching PRs created: %w", err)
 	}
+	slog.Info("Found PRs created", "count", len(prsCreated))
 	for _, item := range prsCreated {
 		pr := PullRequest{
 			Title:      item.Title,
@@ -174,10 +177,12 @@ func Fetch(client *api.RESTClient, user string, opts Options) (*LookbackResult, 
 	}
 
 	// PRs reviewed by user (excluding own PRs)
+	slog.Info("Fetching PRs reviewed ...", "user", user)
 	prsReviewed, err := searchAll(client, fmt.Sprintf("type:pr reviewed-by:%s -author:%s created:%s", user, user, dateRange))
 	if err != nil {
 		return nil, fmt.Errorf("searching PRs reviewed: %w", err)
 	}
+	slog.Info("Found PRs reviewed", "count", len(prsReviewed))
 	for _, item := range prsReviewed {
 		pr := PullRequest{
 			Title:      item.Title,
@@ -196,10 +201,12 @@ func Fetch(client *api.RESTClient, user string, opts Options) (*LookbackResult, 
 	}
 
 	// Issues created by user
+	slog.Info("Fetching issues created ...", "user", user)
 	issuesCreated, err := searchAll(client, fmt.Sprintf("type:issue author:%s created:%s", user, dateRange))
 	if err != nil {
 		return nil, fmt.Errorf("searching issues created: %w", err)
 	}
+	slog.Info("Found issues created", "count", len(issuesCreated))
 	for _, item := range issuesCreated {
 		issue := Issue{
 			Title:      item.Title,
@@ -237,6 +244,7 @@ func searchAll(client *api.RESTClient, query string) ([]searchItem, error) {
 		if len(allItems) >= resp.TotalCount || len(resp.Items) < perPage {
 			break
 		}
+		slog.Info("Fetching more results ...", "fetched", len(allItems), "total", resp.TotalCount)
 		page++
 	}
 
