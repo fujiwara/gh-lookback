@@ -15,7 +15,7 @@
 # vendor/
 
 .envrc
-gh-lookback
+/gh-lookback
 .claude/
 .vscode/
 dist/
